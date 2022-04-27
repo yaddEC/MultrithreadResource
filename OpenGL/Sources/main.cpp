@@ -6,13 +6,22 @@
 #include <STB_Image/stb_image.h>
 
 #include <iostream>
+#include <App.h>
+#include <Log.h>
+using namespace Core;
+using namespace Debug;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 
+#define ASSERT(condition, message) if(!condition) throw std::runtime_error(message);
+#define DEBUG_LOG(VAR,...)(Log::DebugLog(__FILE__,__LINE__,VAR,__VA_ARGS__));
+
+
 
 void APIENTRY glDebugOutput(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
 {
+
 	// ignore non-significant error/warning codes
 	if (id == 131169 || id == 131185 || id == 131218 || id == 131204) return;
 
@@ -85,50 +94,23 @@ const char* fragmentShaderSource = "#version 330 core\n"
 
 int main()
 {
-	// glfw: initialize and configure
-	// ------------------------------
-	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+	AppInitializer initialiser = {SCR_WIDTH, SCR_HEIGHT, 4, 5, "Chayen", framebuffer_size_callback, glDebugOutput};
+	App app;
+	app.Init(initialiser);
+	Log log;
+	log.OpenFile("test.txt");
+	
+	DEBUG_LOG("test");
+	
+	ASSERT(true,"marche po");
 
 
-	// glfw window creation
-	// --------------------
-	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
-	if (window == NULL)
-	{
-		std::cout << "Failed to create GLFW window" << std::endl;
-		glfwTerminate();
-		return -1;
-	}
-	glfwMakeContextCurrent(window);
-	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
-	// glad: load all OpenGL function pointers
-	// ---------------------------------------
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-	{
-		std::cout << "Failed to initialize GLAD" << std::endl;
-		return -1;
-	}
-
-
-	GLint flags = 0;
-	glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
-	if (flags & GL_CONTEXT_FLAG_DEBUG_BIT)
-	{
-		glEnable(GL_DEBUG_OUTPUT);
-		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-		glDebugMessageCallback(glDebugOutput, nullptr);
-		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
-	}
-
+	
 
 	// build and compile our shader program
 	// ------------------------------------
 	// vertex shader
+	
 	int vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
 	glCompileShader(vertexShader);
@@ -259,38 +241,10 @@ int main()
 	glBindSampler(1, sampler);
 
 
-	// render loop
-	// -----------
-	while (!glfwWindowShouldClose(window))
+	
+	while (!glfwWindowShouldClose(app.window))
 	{
-		// input
-		// -----
-		glfwPollEvents();
-		processInput(window);
-
-		// render
-		// ------
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
-
-		//glBindTexture(GL_TEXTURE_2D, texture);
-
-
-
-		// draw our first triangle
-		glUseProgram(shaderProgram);
-		glUniform1i(glGetUniformLocation(shaderProgram, "texture1"), 0); // set it manually
-		glUniform1i(glGetUniformLocation(shaderProgram, "texture2"), 1); // set it manually
-
-		glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
-
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-		// glBindVertexArray(0); // no need to unbind it every time
-
-		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-		// -------------------------------------------------------------------------------
-		glfwSwapBuffers(window);
+		app.Update(shaderProgram, VAO);
 
 	}
 
@@ -318,9 +272,7 @@ int main()
 
 	glDeleteSamplers(1, &sampler);
 
-	// glfw: terminate, clearing all previously allocated GLFW resources.
-	// ------------------------------------------------------------------
-	glfwTerminate();
+	
 	return 0;
 }
 
@@ -329,11 +281,7 @@ int main()
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
-void processInput(GLFWwindow* window)
-{
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, true);
-}
+
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
 // ---------------------------------------------------------------------------------------------

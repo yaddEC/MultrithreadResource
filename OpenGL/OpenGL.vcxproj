@@ -18,6 +18,17 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Headers\App.h" />
+    <ClInclude Include="Headers\Assertion.h" />
+    <ClInclude Include="Headers\Log.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Sources\App.cpp" />
+    <ClCompile Include="Sources\glad.c" />
+    <ClCompile Include="Sources\Log.cpp" />
+    <ClCompile Include="Sources\main.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
@@ -148,10 +159,6 @@
       <AdditionalDependencies>opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="Sources\glad.c" />
-    <ClCompile Include="Sources\main.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
