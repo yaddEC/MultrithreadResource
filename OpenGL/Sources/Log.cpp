@@ -4,7 +4,6 @@ using namespace std;
 
 using namespace Core;
 using namespace Debug;
-
 void Log::DebugLog(const char* file,int line, const char* format, ...)
 {
     va_list args;
