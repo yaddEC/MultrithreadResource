@@ -1,3 +1,4 @@
+#include <windows.h>
 #include <Log.h>
 
 using namespace std;
@@ -72,6 +73,12 @@ void Log::Print(const char* format, ...)
                 {
                     logFile << i;
                 }
+            }
+
+            else if (*format == 's')
+            {
+                char* i = va_arg(args, char *);
+                    Print(i);
             }
             else
             {

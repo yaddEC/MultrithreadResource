@@ -1,4 +1,5 @@
 
+#include <Log.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -7,7 +8,7 @@
 
 #include <iostream>
 #include <App.h>
-#include <Log.h>
+
 using namespace Core;
 using namespace Debug;
 
@@ -99,10 +100,11 @@ int main()
 	Log log;
 	log.OpenFile("test.txt");
 	
-	DEBUG_LOG("test");
 	
-	ASSERT(true,"marche po");
+	
+	ASSERT(true,"marche po et pi c tout");
 
+	DEBUG_LOG(" marche po et pi ke c comme ço lo");
 
 	
 

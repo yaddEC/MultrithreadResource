@@ -1,10 +1,47 @@
-#include <Maths.h>
 #include <Log.h>
+#include <Maths.h>
+
 
 using namespace Core;
 using namespace Maths;
 
 #define M_PI 3.14159265358979323846
+
+Vec2::Vec2()
+{
+    x = 0;
+    y = 0;
+}
+
+Vec2::Vec2(float a, float b)
+{
+    x = a;
+    y = b;
+}
+
+void Vec2::Print()
+{
+    Debug::Log vec2;
+    vec2.Print("x = %f  y = %f\n",x,y);
+}
+
+
+float Vec2::GetMagnitude()
+{
+    return sqrt(pow(x, 2) + pow(y, 2));
+}
+
+Vec2 Vec2::Normalize()
+{
+    x = x / GetMagnitude();
+    y = y / GetMagnitude();
+    return { x, y };
+}
+
+Vec2::~Vec2()
+{
+}
+
 Vec3::Vec3()
 {
     x = 0;
@@ -18,7 +55,11 @@ Vec3::Vec3(float a, float b, float c)
     y = b;
     z = c;
 }
-
+void Vec3::Print()
+{
+    Debug::Log vec3;
+    vec3.Print("x = %f  y = %f   z = %f\n", x, y,z);
+}
 float Vec3::GetMagnitude()
 {
     return sqrt(pow(x, 2) + pow(y, 2) + pow(z, 2));

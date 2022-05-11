@@ -1,5 +1,5 @@
 #pragma once
-#include <windows.h>
+
 #include <filesystem>
 #include <cstdarg>
 #include <fstream>

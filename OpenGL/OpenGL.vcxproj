@@ -24,6 +24,7 @@
     <ClInclude Include="Headers\IResource.h" />
     <ClInclude Include="Headers\Log.h" />
     <ClInclude Include="Headers\Maths.h" />
+    <ClInclude Include="Headers\Model.h" />
     <ClInclude Include="Headers\ResourceManager.h" />
   </ItemGroup>
   <ItemGroup>
@@ -32,6 +33,11 @@
     <ClCompile Include="Sources\Log.cpp" />
     <ClCompile Include="Sources\main.cpp" />
     <ClCompile Include="Sources\Maths.cpp" />
+    <ClCompile Include="Sources\Model.cpp" />
+    <ClCompile Include="Sources\ResourceManager.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Sources\ResourceManager.tpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

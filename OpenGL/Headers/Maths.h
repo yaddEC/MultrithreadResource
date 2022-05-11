@@ -4,6 +4,19 @@ namespace Core
 {
 	namespace Maths
 	{
+		class Vec2
+		{
+		public:
+			Vec2();
+			Vec2(float a, float b);
+			float x;
+			float y;
+			void Print();
+			float GetMagnitude();
+			Vec2 Normalize();
+			~Vec2();
+		};
+
 		class Vec3
 		{
 		public:
@@ -12,7 +25,7 @@ namespace Core
 			float x;
 			float y;
 			float z;
-
+			void Print();
 			float GetMagnitude();
 			Vec3 Normalize();
 			~Vec3();

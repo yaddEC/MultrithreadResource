@@ -6,6 +6,7 @@ namespace Resources
     {
     public:
 		IResource() {  }
+        virtual void Load(const std::string& path) {  }
 		virtual ~IResource() {  }
     };
      

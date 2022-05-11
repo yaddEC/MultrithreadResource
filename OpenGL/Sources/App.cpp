@@ -1,4 +1,7 @@
 #include <App.h>
+#include <chrono>
+
+
 using namespace Core;
 
 void processInput(GLFWwindow* window)
@@ -55,6 +58,17 @@ void App::Init(AppInitializer init)
 		glDebugMessageCallback(init.glDebutOutput, nullptr);
 		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
 	}
+	Model* cube;
+	ResourceManager resources;
+	
+	auto begin = std::chrono::high_resolution_clock::now();
+	resources.Create<Model>("Resources/Obj/cube.obj");
+	cube = resources.Get<Model>("Resources/Obj/cube.obj");
+
+	auto end = std::chrono::high_resolution_clock::now();
+	auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
+	printf("Time measured: %.62f seconds.\n", elapsed.count() * 1e-9);
+	cube->Print();
 
 }
 void App::Update(int shaderProgram, unsigned int VAO)
