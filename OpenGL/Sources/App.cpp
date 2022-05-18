@@ -2,6 +2,7 @@
 #include <chrono>
 
 
+
 using namespace Core;
 
 void processInput(GLFWwindow* window)
@@ -59,11 +60,26 @@ void App::Init(AppInitializer init)
 		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
 	}
 
-
+	glEnable(GL_DEPTH_TEST);
 }
 void App::Update(int shaderProgram, unsigned int VAO)
 {
 	
+	Mat4 modelMatrix;
+	modelMatrix =modelMatrix.identity();
+	modelMatrix.CreateTransformMatrix(Vec3(0, (float)glfwGetTime(), (float)glfwGetTime()), Vec3(0, 0, 0), Vec3(0.5f, 0.5f, 0.5f));
+
+	Mat4 viewMatrix;
+	viewMatrix = viewMatrix.identity();
+	viewMatrix.CreateTranslationMatrix(Vec3(0, 0, 9));
+
+	Mat4 transformMatrix = viewMatrix.Perspective() * viewMatrix * modelMatrix;
+
+	unsigned int transformLoc = glGetUniformLocation(shaderProgram, "transform");
+
+	
+	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, transformMatrix.mat);
+
 		// input
 		// -----
 		glfwPollEvents();
@@ -73,7 +89,7 @@ void App::Update(int shaderProgram, unsigned int VAO)
 		// ------
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
-
+		glClear(GL_DEPTH_BUFFER_BIT);
 		//glBindTexture(GL_TEXTURE_2D, texture);
 
 

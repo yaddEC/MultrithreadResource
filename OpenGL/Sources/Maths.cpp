@@ -5,7 +5,7 @@
 using namespace Core;
 using namespace Maths;
 
-#define M_PI 3.14159265358979323846
+
 
 Vec2::Vec2()
 {
@@ -208,6 +208,8 @@ Mat4::Mat4()
     }
 }
 
+
+
 void Mat4::Print()
 {
     Debug::Log matrix;
@@ -373,6 +375,8 @@ Mat4 Mat4::CreateTransformMatrix(const Vec3& rotation, const Vec3& position, con
     return  temp ; */
     return CreateTranslationMatrix(position) * (CreateYRotationMatrix(rotation.y) * CreateXRotationMatrix(rotation.x) * CreateZRotationMatrix(rotation.z)) * CreateScaleMatrix(scale);
 }
+
+
 
 Mat4 Mat4::Perspective()
 {

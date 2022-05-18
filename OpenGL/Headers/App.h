@@ -4,14 +4,16 @@
 #include <ResourceManager.h>
 #include <Log.h>
 #include <Model.h>
-
+#include <Camera.h>
 
 
 #include <iostream>
+using namespace LowRenderer;
 namespace Core
 {
 	struct AppInitializer
 	{
+		Camera cam;
 		unsigned int width;
 		unsigned int height;
 		unsigned int major;

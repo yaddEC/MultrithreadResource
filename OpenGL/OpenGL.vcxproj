@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="Headers\App.h" />
     <ClInclude Include="Headers\Assertion.h" />
+    <ClInclude Include="Headers\Camera.h" />
     <ClInclude Include="Headers\IResource.h" />
     <ClInclude Include="Headers\Log.h" />
     <ClInclude Include="Headers\Maths.h" />
@@ -30,6 +31,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\App.cpp" />
+    <ClCompile Include="Sources\Camera.cpp" />
     <ClCompile Include="Sources\glad.c" />
     <ClCompile Include="Sources\Log.cpp" />
     <ClCompile Include="Sources\main.cpp" />
