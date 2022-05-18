@@ -58,17 +58,7 @@ void App::Init(AppInitializer init)
 		glDebugMessageCallback(init.glDebutOutput, nullptr);
 		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
 	}
-	Model* cube;
-	ResourceManager resources;
-	
-	auto begin = std::chrono::high_resolution_clock::now();
-	resources.Create<Model>("Resources/Obj/cube.obj");
-	cube = resources.Get<Model>("Resources/Obj/cube.obj");
 
-	auto end = std::chrono::high_resolution_clock::now();
-	auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
-	printf("Time measured: %.62f seconds.\n", elapsed.count() * 1e-9);
-	cube->Print();
 
 }
 void App::Update(int shaderProgram, unsigned int VAO)
@@ -95,7 +85,7 @@ void App::Update(int shaderProgram, unsigned int VAO)
 
 		glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
 
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
 		// glBindVertexArray(0); // no need to unbind it every time
 

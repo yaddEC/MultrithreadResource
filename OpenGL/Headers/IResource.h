@@ -1,5 +1,5 @@
 #pragma once
-
+#include <string>
 namespace Resources
 {
     class IResource

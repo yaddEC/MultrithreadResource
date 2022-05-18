@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <App.h>
+#include <Shader.h>
 
 using namespace Core;
 using namespace Debug;
@@ -65,32 +66,7 @@ void APIENTRY glDebugOutput(GLenum source, GLenum type, GLuint id, GLenum severi
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-const char* vertexShaderSource = "#version 330 core\n"
-"layout(location = 0) in vec3 aPos;"
-"layout(location = 1) in vec3 aColor;"
-"layout(location = 2) in vec2 aTexCoord;"
 
-"out vec3 ourColor;"
-"out vec2 TexCoord;"
-
-"void main()"
-"{"
-"	gl_Position = vec4(aPos, 1.0);"
-"	ourColor = aColor;"
-"	TexCoord = aTexCoord;"
-"}\0";
-
-const char* fragmentShaderSource = "#version 330 core\n"
-"out vec4 FragColor;"
-
-"in vec3 ourColor;"
-"in vec2 TexCoord;"
-"uniform sampler2D texture1;"
-"uniform sampler2D texture2;"
-"void main()"
-"{"
-"	FragColor = mix(texture(texture1, TexCoord), texture(texture2, TexCoord), 0.5);"
-"}\0";
 
 int main()
 {
@@ -106,48 +82,16 @@ int main()
 
 	DEBUG_LOG(" marche po et pi ke c comme ço lo");
 
-	
+	Shader shader;
 
 	// build and compile our shader program
 	// ------------------------------------
 	// vertex shader
-	
-	int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-	glCompileShader(vertexShader);
-	// check for shader compile errors
-	int success;
-	char infoLog[512];
-	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-	}
+	shader.SetVertexShader("Resources/Shaders/vertexShader.glsl");
 	// fragment shader
-	int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-	glCompileShader(fragmentShader);
-	// check for shader compile errors
-	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-	}
+	shader.SetFragmentShader("Resources/Shaders/fragmentShader.glsl");
 	// link shaders
-	int shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
-	// check for linking errors
-	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-	if (!success) {
-		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
-	}
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
+	shader.Link();
 
 	// set up vertex data (and buffer(s)) and configure vertex attributes
 	// ------------------------------------------------------------------
@@ -241,11 +185,22 @@ int main()
 	glBindTextureUnit(1, texture2);
 	glBindSampler(1, sampler);
 
+	Model* cube;
+	ResourceManager resources;
+
+	auto begin = std::chrono::high_resolution_clock::now();
+	resources.Create<Model>("Resources/Obj/cube.obj");
+	cube = resources.Get<Model>("Resources/Obj/cube.obj");
+
+	auto end = std::chrono::high_resolution_clock::now();
+	auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
+	printf("Time measured: %.62f seconds.\n", elapsed.count() * 1e-9);
+	cube->Print();
 
 	
 	while (!glfwWindowShouldClose(app.window))
 	{
-		app.Update(shaderProgram, VAO);
+		app.Update(shader.shaderProgram, cube->vao.vao);
 
 	}
 

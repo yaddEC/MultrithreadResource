@@ -1,15 +1,73 @@
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 #include <Log.h>
-
 #include <Model.h>
-
-#include <App.h>
-
 #include <sstream>
 
 using namespace Core::Maths;
 using namespace Core::Debug;
 using namespace std;
 using namespace Resources;
+
+#define GLEW_STATIC
+
+
+
+void VertexAttributes::Load(vector <Vertex> vertices, vector <uint32_t> indexes, Buffer vbo, Buffer ebo) {
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+    glGenBuffers(1, &vbo.buffer);
+    glGenBuffers(1, &ebo.buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo.buffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex)*vertices.size(), vertices.data(), GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,ebo.buffer);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t)*indexes.size(), indexes.data(), GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)) );
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+   
+
+}
+
+VertexAttributes::VertexAttributes() {}
+
+VertexAttributes::~VertexAttributes() {
+
+}
+
+void VertexAttributes::bind() {
+    glBindVertexArray(vao);
+}
+
+void VertexAttributes::unbind() {
+    glBindVertexArray(0);
+}
+
+Buffer::Buffer(const void* data, unsigned int size) {
+    glGenBuffers(1, &buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, buffer);
+    glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+}
+
+Buffer::Buffer() {}
+
+Buffer::~Buffer() {
+    glDeleteBuffers(1, &buffer);
+}
+
+void Buffer::bind() {
+    glBindBuffer(GL_ARRAY_BUFFER, buffer);
+}
+
+void Buffer::unbind() {
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
 
 void Model::Print() {
     Log log;
@@ -103,12 +161,16 @@ void Model::Load(const std::string& path) {
     }
 
     vertices.resize(indexVertex.size(), Vertex());
+    indexes.resize(indexVertex.size());
 
     for (size_t i = 0; i < vertices.size(); ++i) {
         vertices[i].position = tempVertex[indexVertex[i] - 1];
         vertices[i].textureUV = tempUV[indexUV[i] - 1];
         vertices[i].normal = tempNormals[indexNormal[i] - 1];
+        indexes[i] = i;
     }
     log.Print("Loaded \n");
+
+    vao.Load(vertices,indexes,vbo,ebo);
 
 }

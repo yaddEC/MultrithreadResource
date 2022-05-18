@@ -26,6 +26,7 @@
     <ClInclude Include="Headers\Maths.h" />
     <ClInclude Include="Headers\Model.h" />
     <ClInclude Include="Headers\ResourceManager.h" />
+    <ClInclude Include="Headers\Shader.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\App.cpp" />
@@ -35,6 +36,7 @@
     <ClCompile Include="Sources\Maths.cpp" />
     <ClCompile Include="Sources\Model.cpp" />
     <ClCompile Include="Sources\ResourceManager.cpp" />
+    <ClCompile Include="Sources\Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sources\ResourceManager.tpp" />
