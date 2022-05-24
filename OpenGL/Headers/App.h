@@ -5,7 +5,8 @@
 #include <Log.h>
 #include <Model.h>
 #include <Camera.h>
-
+#include <Mesh.h>
+#include <Light.h>
 
 #include <iostream>
 using namespace LowRenderer;
@@ -13,7 +14,7 @@ namespace Core
 {
 	struct AppInitializer
 	{
-		Camera cam;
+		
 		unsigned int width;
 		unsigned int height;
 		unsigned int major;
@@ -28,9 +29,25 @@ namespace Core
 
 	public:
 		~App();
+		App() {};
+		int nbrOfDir ;
+		int nbrOfPoint;
+		int nbrOfSpot ;
+		bool firstMouse = true;
+		std::vector<Mesh*> meshes;
+		Camera camera;
+		CameraInputs inputs;
+		std::vector<Light*> lights;
+		double mouseX = 0.0;
+		double mouseY = 0.0;
+		float mouseDeltaX = 0.0;
+		float mouseDeltaY = 0.0;
+
+		double newMouseX, newMouseY;
 		GLFWwindow* window;
 		void Init(AppInitializer init);
 		void Update(int shaderProgram, unsigned int VAO);
+		void processInput(GLFWwindow* window);
 	};
 
 }

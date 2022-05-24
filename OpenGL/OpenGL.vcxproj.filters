@@ -42,6 +42,12 @@
     <ClInclude Include="Headers\Camera.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
+    <ClInclude Include="Headers\Mesh.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\Light.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\glad.c">
@@ -71,10 +77,18 @@
     <ClCompile Include="Sources\Camera.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\Mesh.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Light.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Sources\ResourceManager.tpp">
       <Filter>Fichiers sources</Filter>
     </None>
+    <None Include="Resources\Shaders\fragmentShader.glsl" />
+    <None Include="Resources\Shaders\vertexShader.glsl" />
   </ItemGroup>
 </Project>

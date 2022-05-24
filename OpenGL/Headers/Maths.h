@@ -5,6 +5,7 @@ namespace Core
 	namespace Maths
 	{
 	#define M_PI 3.14159265358979323846
+	#define rad(angle) ((angle) * M_PI / 180.0)
 		class Vec2
 		{
 		public:
@@ -77,7 +78,7 @@ namespace Core
 			~Mat3();
 		};
 
-
+		
 		class Mat4
 		{
 		public:
@@ -100,7 +101,7 @@ namespace Core
 
 			~Mat4();
 		};
-
+		Mat4 Invert(Mat4 matrix);
 
 	}
 }

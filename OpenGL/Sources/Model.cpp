@@ -1,8 +1,6 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <Log.h>
+
 #include <Model.h>
-#include <sstream>
+
 
 using namespace Core::Maths;
 using namespace Core::Debug;
@@ -22,11 +20,11 @@ void VertexAttributes::Load(vector <Vertex> vertices, vector <uint32_t> indexes,
     glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex)*vertices.size(), vertices.data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,ebo.buffer);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t)*indexes.size(), indexes.data(), GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)) );
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(3 * sizeof(float)) );
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE,sizeof(Vertex), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
     glBindVertexArray(0);
@@ -38,7 +36,7 @@ void VertexAttributes::Load(vector <Vertex> vertices, vector <uint32_t> indexes,
 VertexAttributes::VertexAttributes() {}
 
 VertexAttributes::~VertexAttributes() {
-
+    glDeleteVertexArrays(1, &vao);
 }
 
 void VertexAttributes::bind() {

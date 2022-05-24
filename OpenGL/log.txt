@@ -1,1 +1,1 @@
-C:\Users\y.dechaux\Documents\MOOGL\OpenGL\Sources\main.cpp(83): marche po et pi ke c comme ço lo
+C:\Users\y.dechaux\Documents\MOOGL\OpenGL\Sources\main.cpp(83): DebugLog Test 

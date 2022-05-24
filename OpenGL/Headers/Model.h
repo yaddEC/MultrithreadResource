@@ -3,6 +3,10 @@
 #include <Maths.h>
 #include <vector>
 #include <iostream>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include <Log.h>
+#include <sstream>
 using namespace Core::Maths;
 using namespace std;
 namespace Resources
