@@ -14,7 +14,7 @@ void Log::DebugLog(const char* file,int line, const char* format, ...)
     debugLog.Print(file);
     debugLog.Print("(%i):", line);
     debugLog.Print(format, args);
-    char buffer[100];
+    char buffer[1000];
     sprintf_s(buffer, "%s(%i):%s\n", file,line,format);
     OutputDebugStringA(buffer);
 }
