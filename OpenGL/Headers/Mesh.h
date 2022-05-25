@@ -12,8 +12,8 @@ namespace LowRenderer
 		Model* model;
 		Mat4 modelMatrix;
 		public:
-
-			Mesh(Model* model, const Mat4& mat);
+			GLuint texture;
+			Mesh(Model* model, const Mat4& mat, const char* file);
 			~Mesh();
 			void Update( Mat4& projviewMatrix, unsigned int shaderProgram);
 	};

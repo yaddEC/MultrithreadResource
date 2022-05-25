@@ -7,7 +7,7 @@
 #include <Camera.h>
 #include <Mesh.h>
 #include <Light.h>
-
+#include <GameObject.h>
 #include <iostream>
 using namespace LowRenderer;
 namespace Core
@@ -30,11 +30,13 @@ namespace Core
 	public:
 		~App();
 		App() {};
+		bool mouseCaptured = false;
 		int nbrOfDir ;
 		int nbrOfPoint;
 		int nbrOfSpot ;
 		bool firstMouse = true;
 		std::vector<Mesh*> meshes;
+		std::vector<GameObject*> gameObjects;
 		Camera camera;
 		CameraInputs inputs;
 		std::vector<Light*> lights;

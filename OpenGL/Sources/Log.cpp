@@ -2,9 +2,9 @@
 #include <Log.h>
 
 using namespace std;
-
 using namespace Core;
 using namespace Debug;
+
 void Log::DebugLog(const char* file,int line, const char* format, ...)
 {
     va_list args;
@@ -21,7 +21,7 @@ void Log::DebugLog(const char* file,int line, const char* format, ...)
 
 void Log::OpenFile(std::filesystem::path const& filename)
 {
-    logFile.open(filename);
+    logFile.open(filename, std::ofstream::out | std::ofstream::app);
     if (logFile.fail())
         Print("File can't be opened");
 }

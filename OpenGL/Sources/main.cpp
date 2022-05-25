@@ -2,10 +2,6 @@
 #include <Log.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
-#define STB_IMAGE_IMPLEMENTATION
-#include <STB_Image/stb_image.h>
-
 #include <iostream>
 #include <App.h>
 #include <Shader.h>
@@ -15,10 +11,6 @@ using namespace Debug;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
-
-
-
-
 
 void APIENTRY glDebugOutput(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
 {
@@ -70,15 +62,16 @@ const unsigned int SCR_HEIGHT = 600;
 
 int main()
 {
-	AppInitializer initialiser = {SCR_WIDTH, SCR_HEIGHT, 4, 5, "Chayen", framebuffer_size_callback, glDebugOutput};
+
+	//Create/Initialise the App window
+	AppInitializer initialiser = { SCR_WIDTH, SCR_HEIGHT, 4, 5, "Chayen", framebuffer_size_callback, glDebugOutput };
 	App app;
 	app.Init(initialiser);
+	
 	Log log;
 	log.OpenFile("test.txt");
-	
-	
-	
-	ASSERT(true,"Assertion test \n");
+
+	ASSERT(true, "Assertion test \n");
 
 	DEBUG_LOG(" DebugLog Test \n");
 
@@ -89,65 +82,41 @@ int main()
 
 	auto begin = std::chrono::high_resolution_clock::now();
 	resources.Create<Model>("Resources/Obj/cube.obj");
-	resources.Create<Model>("Resources/Obj/fe.obj");
+	resources.Create<Model>("Resources/Obj/malbazar.obj");
 	cube = resources.Get<Model>("Resources/Obj/cube.obj");
-	model = resources.Get<Model>("Resources/Obj/fe.obj");
+	model = resources.Get<Model>("Resources/Obj/malbazar.obj");
 	auto end = std::chrono::high_resolution_clock::now();
 	auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
 	printf("Time measured: %.62f seconds.\n", elapsed.count() * 1e-9);
+	//print the vertices in the console
 	//cube->Print();
 	
-	app.meshes.push_back(new Mesh(cube, Mat4().CreateTransformMatrix(Vec3(0, 0, 0), Vec3(0, 0,0), Vec3(10, 1,10))));
-	app.meshes.push_back(new Mesh(model, Mat4().CreateTransformMatrix(Vec3(1, 0, 0), Vec3(-4, 8, -4), Vec3(0.5, 0.5, 0.5))));
+	//create the meshes
+	app.meshes.push_back(new Mesh(cube, Mat4().CreateTransformMatrix(Vec3(0, 0, 0), Vec3(0, -5, 0), Vec3(10, 1, 10)), "sample.png"));
+	app.meshes.push_back(new Mesh(model, Mat4().CreateTransformMatrix(Vec3(0, 180, 0), Vec3(0, -2, 0), Vec3(0.01, 0.01, 0.01)), "Resources/Textures/malbazar.png"));
+	app.meshes.push_back(new Mesh(cube, Mat4().CreateTransformMatrix(Vec3(1, 0, 0), Vec3(0, 3, -4), Vec3(0.5, 0.5, 0.5)), "sample2.png"));
+
+	//link them to gameObjects
+	app.gameObjects.push_back(new GameObject("cube chat", app.meshes[0]));
+	app.gameObjects.push_back(new GameObject("cube chien", app.meshes[2], app.gameObjects[0]));//this one has 'cube chat' as a parent
+	app.gameObjects.push_back(new GameObject("malbazar", app.meshes[1]));
+
+
+	for (int i = 0; i < app.gameObjects.size(); i++)
+	{
+		if (app.gameObjects[i]->parent != nullptr)
+		{
+			app.gameObjects[i]->parent->childrens.push_back(*app.gameObjects[i]);
+		}
+	}
 	// build and compile our shader program
-	// ------------------------------------
+	// 
 	// vertex shader
 	shader.SetVertexShader("Resources/Shaders/vertexShader.glsl");
 	// fragment shader
 	shader.SetFragmentShader("Resources/Shaders/fragmentShader.glsl");
 	// link shaders
 	shader.Link();
-
-	// set up vertex data (and buffer(s)) and configure vertex attributes
-	// ------------------------------------------------------------------
-	
-
-	
-
-	// glGenBuffers(1, &VBO);
-
-
-
-
-
-	// generate the texture data
-	// ------------------------------------
-	int width, height, nrChannels;
-
-	stbi_set_flip_vertically_on_load(true);
-	unsigned char* data = stbi_load("sample.png", &width, &height, &nrChannels, 0);
-
-	GLuint texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-
-	stbi_image_free(data);
-
-	data = stbi_load("sample2.png", &width, &height, &nrChannels, 0);
-
-	GLuint texture2;
-
-	glGenTextures(1, &texture2);
-	glBindTexture(GL_TEXTURE_2D, texture2);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-
-	stbi_image_free(data);
-
 
 	// create a sampler and parameterize it
 	// ------------------------------------
@@ -162,49 +131,21 @@ int main()
 	GLint max = 0;
 	glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &max);
 
-
-	glBindTextureUnit(0, texture);
 	glBindSampler(0, sampler);
 
-	glBindTextureUnit(1, texture2);
-	glBindSampler(1, sampler);
-
-
-
-	
 	while (!glfwWindowShouldClose(app.window))
 	{
 		app.Update(shader.shaderProgram, cube->vao.vao);
-
 	}
 
-
-
-	// remember: do NOT unbind the EBO while a VAO is active as the bound element buffer object IS stored in the VAO; keep the EBO bound.
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-
-	// note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
-	//glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-
-	// uncomment this call to draw in wireframe polygons.
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-
-	// optional: de-allocate all resources once they've outlived their purpose:
-	// ------------------------------------------------------------------------
-
-
-	glDeleteTextures(1, &texture);
+	for (int i = 0; i < app.meshes.size(); i++)
+		glDeleteTextures(1, &app.meshes[i]->texture);
 
 	glDeleteSamplers(1, &sampler);
 
-	
+
 	return 0;
 }
-
-
 
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
