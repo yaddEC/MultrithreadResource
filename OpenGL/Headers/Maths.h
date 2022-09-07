@@ -30,7 +30,15 @@ namespace Core
 			void Print();
 			float GetMagnitude();
 			Vec3 Normalize();
+
 			~Vec3();
+
+			//--------(o.luanda)-----------
+			const float* GetAsFloatPtr() const
+			{
+				return reinterpret_cast<const float*>(&x);
+			}
+			//--------(o.luanda)-----------
 		};
 		float dot(const Vec3& a, const Vec3& b);
 		float operator*(const Vec3& a, const Vec3& b);

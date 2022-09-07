@@ -87,7 +87,7 @@ int main()
 	model = resources.Get<Model>("Resources/Obj/malbazar.obj");
 	auto end = std::chrono::high_resolution_clock::now();
 	auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
-	printf("Time measured: %.62f seconds.\n", elapsed.count() * 1e-9);
+	printf("Time measured: %.2f seconds.\n", elapsed.count() * 1e-9);
 	//print the vertices in the console
 	//cube->Print();
 	
@@ -148,15 +148,10 @@ int main()
 }
 
 
-// process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
-// ---------------------------------------------------------------------------------------------------------
 
 
-// glfw: whenever the window size changed (by OS or user resize) this callback function executes
-// ---------------------------------------------------------------------------------------------
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
-	// make sure the viewport matches the new window dimensions; note that width and
-	// height will be significantly larger than specified on retina displays.
 	glViewport(0, 0, width, height);
 }

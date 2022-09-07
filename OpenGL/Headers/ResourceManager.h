@@ -22,7 +22,7 @@ public:
 	}
 
 	template <typename T>
-	 T* Get(const std::string& name)
+	T* Get(const std::string& name)
 	{
 		auto found =  resources.find(name);
 		if (found != resources.end())

@@ -1,0 +1,10 @@
+C:\Deve\Doom\OpenGL\Sources\main.cpp(76): DebugLog Test 
+C:\Deve\Doom\OpenGL\Sources\main.cpp(76): DebugLog Test 
+C:\Deve\Doom\OpenGL\Sources\main.cpp(76): DebugLog Test 
+C:\Deve\Doom\OpenGL\Sources\main.cpp(76): DebugLog Test 
+C:\Deve\Doom\OpenGL\Sources\main.cpp(76): DebugLog Test 
+C:\Deve\Doom\OpenGL\Sources\main.cpp(76): DebugLog Test 
+C:\Deve\Doom\OpenGL\Sources\main.cpp(76): DebugLog Test 
+C:\Deve\Doom\OpenGL\Sources\main.cpp(76): DebugLog Test 
+C:\Deve\Doom\OpenGL\Sources\main.cpp(76): DebugLog Test 
+C:\Deve\Doom\OpenGL\Sources\main.cpp(76): DebugLog Test 

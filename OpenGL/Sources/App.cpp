@@ -8,16 +8,11 @@ using namespace Core;
 
 App::~App()
 {
-	// glfw: terminate, clearing all previously allocated GLFW resources.
-	// ------------------------------------------------------------------
 	glfwTerminate();
 }
 
 void App::Init(AppInitializer init)
 {
-
-	// glfw: initialize and configure
-	// ------------------------------
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
@@ -124,25 +119,23 @@ void App::Update(int shaderProgram, unsigned int VAO)
 
 	//push matrix/floats to shader
 	glUseProgram(shaderProgram);
-	unsigned int viewPosLoc = glGetUniformLocation(shaderProgram, "viewPos");
-	glUniform3f(viewPosLoc, camera.from.x, camera.from.y, camera.from.z);
-	unsigned int nbrOfDirLoc = glGetUniformLocation(shaderProgram, "nbrOfDir");
-	glUniform1i(nbrOfDirLoc, nbrOfDir);
-	unsigned int nbrOfPointLoc = glGetUniformLocation(shaderProgram, "nbrOfPoint");
-	glUniform1i(nbrOfPointLoc, nbrOfPoint);
-	unsigned int nbrOfSpotLoc = glGetUniformLocation(shaderProgram, "nbrOfSpot");
-	glUniform1i(nbrOfSpotLoc, nbrOfSpot);
+	glUniform3f(glGetUniformLocation(shaderProgram, "viewPos"), camera.from.x, camera.from.y, camera.from.z);
 
-	unsigned int matDifLoc = glGetUniformLocation(shaderProgram, "material.diffuse");
-	glUniform1i(matDifLoc, 0);
-	unsigned int matSpecLoc = glGetUniformLocation(shaderProgram, "material.specular");
-	glUniform1i(matSpecLoc, 1);
-	unsigned int matShinLoc = glGetUniformLocation(shaderProgram, "material.shininess");
-	glUniform1f(matShinLoc, 128);
+	glUniform1i(glGetUniformLocation(shaderProgram, "nbrOfDir"), nbrOfDir);
+	glUniform1i(glGetUniformLocation(shaderProgram, "nbrOfPoint"), nbrOfPoint);
+	
+	glUniform1i(glGetUniformLocation(shaderProgram, "nbrOfSpot"), nbrOfSpot);
+	glUniform1i(glGetUniformLocation(shaderProgram, "material.diffuse"), 0);
+
+	glUniform1i(glGetUniformLocation(shaderProgram, "material.specular"), 1);
+	glUniform1f(glGetUniformLocation(shaderProgram, "material.shininess"), 128);
+
+
+
 
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
-	glClear(GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 
 	Mat4 projView = camera.GetProjection() * camera.GetView();
 	//Update the lights
@@ -211,11 +204,8 @@ void App::Update(int shaderProgram, unsigned int VAO)
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-	// glBindVertexArray(0); // no need to unbind it every time
-
-	// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-	// -------------------------------------------------------------------------------
 	glfwSwapBuffers(window);
 
 
 }
+
