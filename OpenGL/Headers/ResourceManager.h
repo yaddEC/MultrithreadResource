@@ -24,7 +24,7 @@ public:
 	template <typename T>
 	T* Get(const std::string& name)
 	{
-		auto found =  resources.find(name);
+		auto found = resources.find(name);
 		if (found != resources.end())
 			return  dynamic_cast<T*>(found->second);
 		else
@@ -32,6 +32,8 @@ public:
 	}
 
 	void Delete(const std::string& name);
+	//(o.luanda):Unload resource loaded and clean map of resource
+	void Unload();
 
 private:
 	std::unordered_map<std::string, IResource*> resources;

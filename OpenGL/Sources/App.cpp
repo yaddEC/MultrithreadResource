@@ -6,13 +6,130 @@
 
 using namespace Core;
 
+
+//(o.luanda):Timing
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
+
+
 App::~App()
 {
+	UnloadData();
 	glfwTerminate();
 }
 
-void App::Init(AppInitializer init)
+
+
+void App::ProcessThreadResource()
 {
+
+	mResourceManager->Create<Model>("Resources/Obj/cube.obj");
+	cube = mResourceManager->Get<Model>("Resources/Obj/cube.obj");
+
+	mResourceManager->Create<Model>("Resources/Obj/malbazar.obj");
+	model = mResourceManager->Get<Model>("Resources/Obj/malbazar.obj");
+
+	this->meshes.push_back(new Mesh(cube, Mat4().CreateTransformMatrix(Vec3(M_PI / 4.0f, 0, 0), Vec3(0, -1, 0), Vec3(2, 1, 2)), "Resources/Textures/Cube.png"));
+	this->gameObjects.push_back(new GameObject("cube chat", this->meshes[0]));
+
+
+
+	this->meshes.push_back(new Mesh(model, Mat4().CreateTransformMatrix(Vec3(0, 270, 0), Vec3(0, 1, 0), Vec3(0.01, 0.01, 0.01)), "Resources/Textures/malbazar.png"));
+	this->gameObjects.push_back(new GameObject("malbazar", this->meshes[1]));
+
+	for (int i = 0; i < this->gameObjects.size(); i++)
+	{
+		if (this->gameObjects[i]->parent != nullptr)
+		{
+			this->gameObjects[i]->parent->childrens.push_back(*gameObjects[i]);
+		}
+	}
+}
+
+
+void App::InitSampler()
+{
+	sampler = 0;
+	glGenSamplers(1, &sampler);
+	glSamplerParameteri(sampler, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glSamplerParameteri(sampler, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glSamplerParameteri(sampler, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glSamplerParameteri(sampler, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glSamplerParameterf(sampler, GL_TEXTURE_MAX_ANISOTROPY_EXT, 4.f);
+
+	max = 0;
+	glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &max);
+
+	glBindSampler(0, sampler);
+}
+
+#if 0
+bool App::LoadData()
+{
+
+	mResourceManager->Create<Model>("../assets/cube.obj");
+	cube = mResourceManager->Get<Model>("../assets/cube.obj");
+
+	mResourceManager->Create<Model>("../assets/malbazar.obj");
+	model = mResourceManager->Get<Model>("../assets/malbazar.obj");
+
+	this->meshes.push_back(new Mesh(cube, Mat4().CreateTransformMatrix(Vec3(M_PI / 4.0f, 0, 0), Vec3(0, -1, 0), Vec3(2, 1, 2)), "../assets/Cube.png"));
+	this->gameObjects.push_back(new GameObject("cube chat", this->meshes[0]));
+
+
+	this->meshes.push_back(new Mesh(model, Mat4().CreateTransformMatrix(Vec3(0, 270, 0), Vec3(0, 1, 0), Vec3(0.01, 0.01, 0.01)), "../assets/malbazar.png"));
+	this->gameObjects.push_back(new GameObject("malbazar", this->meshes[1]));
+
+	InitSampler();
+
+	for (int i = 0; i < this->gameObjects.size(); i++)
+	{
+		if (this->gameObjects[i]->parent != nullptr)
+		{
+			this->gameObjects[i]->parent->childrens.push_back(*gameObjects[i]);
+		}
+	}
+
+
+	return true;
+
+}
+#endif
+
+void App::UnloadData()
+{
+	for (int i = 0; i < meshes.size(); i++)
+	{
+		glDeleteTextures(1, &meshes[i]->texture);
+	}
+	glDeleteSamplers(1, &sampler);
+
+	mResourceManager->Unload();
+	delete mResourceManager;
+}
+
+bool App::LoadShaders()
+{
+	if (!shader.SetVertexShader("Resources/Shaders/vertexShader.glsl") ||
+		!shader.SetFragmentShader("Resources/Shaders/fragmentShader.glsl"))
+	{
+		return false;
+	}
+	shader.Link();
+
+	return true;
+}
+
+bool App::Init(AppInitializer init)
+{
+	mResourceManager = new ResourceManager();
+	if (!mResourceManager)
+	{
+		std::cout << "Failed to initialize resource Manager" << std::endl;
+		return false;
+	}
+	new (&resourceThread) std::thread(&App::ProcessThreadResource, this);
+
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
@@ -23,38 +140,26 @@ void App::Init(AppInitializer init)
 	nbrOfDir = 1;
 	nbrOfPoint = 0;
 	nbrOfSpot = 0;
-	//---------------------------------------------------
-	//directional (remove the //)
-	//---------------------------------------------------
-	lights.push_back((new DirectionalLight(Vec3(0.05f, 0.05f, 0.05f), Vec3(0.5f, 0.5f, 0.5f), Vec3(1.0f, 1.0f, 1), Vec3(0, -1, 0))));
-	//lights.push_back((new DirectionalLight(Vec3(0.05f, 0.05f, 0.05f), Vec3(0.5f, 0.5f, 0.5f), Vec3(1.0f, 1.0f, 1), Vec3(-1, 0, 0))));
-	//---------------------------------------------------
-	//point (remove the //)
-	//---------------------------------------------------
-	//lights.push_back(new PointLight(Vec3(0, -2, -2), Vec3(0.05f, 0.05f, 0.05f), Vec3(0.8f, 0.8f, 0.8f), Vec3(1.0f, 1.0f, 1.0f), 1.0f, 0.09, 0.032));
-	//---------------------------------------------------
-	//spot (remove the //)
-	//---------------------------------------------------
-	//lights.push_back(new SpotLight(Vec3(0, -2, 0), Vec3(0, -1, 0), Vec3(0, 0,0), Vec3(1.f,0.f, 1.f), Vec3(0.1f, 0.1f, 1.0f), 0.01f, 0.09, 0.032, cos(rad(15.f)), cos(rad(17.f))));
-	
-	// glfw window creation
-	window = glfwCreateWindow(init.width, init.height, "LearnOpenGL", NULL, NULL);
+
+	lights.push_back((new DirectionalLight(Vec3(0.5f, 0.5f, 0.5f), Vec3(0.5f, 0.5f, 0.5f), Vec3(1.0f, 1.0f, 1), Vec3(0, -1, 0))));
+
+	window = glfwCreateWindow(init.width, init.height, "Game Programming", NULL, NULL);
 	if (window == NULL)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
 		glfwTerminate();
-		return;
+		return false;
 	}
 	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, init.framebuffer_size_callback);
 
-	// glad: load all OpenGL function pointerss
-	// ---------------------------------------
+
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
 		std::cout << "Failed to initialize GLAD" << std::endl;
-		return;
+		return false;
 	}
+
 
 	GLint flags = 0;
 	glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
@@ -66,6 +171,7 @@ void App::Init(AppInitializer init)
 		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
 	}
 
+	InitSampler();
 	glEnable(GL_DEPTH_TEST);
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -73,6 +179,28 @@ void App::Init(AppInitializer init)
 	ImGui::StyleColorsDark();
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init("#version 330");
+
+	//------------(o.luanda)-----------------
+
+
+
+	if (!LoadShaders())
+	{
+		std::cout << "Failed to load shaders." << std::endl;
+		return false;
+	}
+
+
+
+#if 0
+	if (!LoadData())
+	{
+		return false;
+	}
+#endif
+	//------------(o.luanda)-----------------
+
+	return true;
 }
 void App::processInput(GLFWwindow* window)
 {
@@ -95,7 +223,7 @@ void App::processInput(GLFWwindow* window)
 
 }
 
-void App::Update(int shaderProgram, unsigned int VAO)
+void App::Update(float deltaTime)
 {
 	//mouse camera control
 	if (mouseCaptured) {
@@ -115,43 +243,74 @@ void App::Update(int shaderProgram, unsigned int VAO)
 		inputs.deltaY = mouseDeltaY;
 	}
 
-	camera.Update((float)glfwGetTime(), inputs);
+#if 0
+	camera.Update((float)glfwGetTime() * 0.05f, inputs);
+	camera.Update(deltaTime, inputs);
+#endif
 
 	//push matrix/floats to shader
-	glUseProgram(shaderProgram);
-	glUniform3f(glGetUniformLocation(shaderProgram, "viewPos"), camera.from.x, camera.from.y, camera.from.z);
+	glUseProgram(shader.shaderProgram);
+	glUniform3f(glGetUniformLocation(shader.shaderProgram, "viewPos"), camera.from.x, camera.from.y, camera.from.z);
 
-	glUniform1i(glGetUniformLocation(shaderProgram, "nbrOfDir"), nbrOfDir);
-	glUniform1i(glGetUniformLocation(shaderProgram, "nbrOfPoint"), nbrOfPoint);
-	
-	glUniform1i(glGetUniformLocation(shaderProgram, "nbrOfSpot"), nbrOfSpot);
-	glUniform1i(glGetUniformLocation(shaderProgram, "material.diffuse"), 0);
+	glUniform1i(glGetUniformLocation(shader.shaderProgram, "nbrOfDir"), nbrOfDir);
+	glUniform1i(glGetUniformLocation(shader.shaderProgram, "nbrOfPoint"), nbrOfPoint);
 
-	glUniform1i(glGetUniformLocation(shaderProgram, "material.specular"), 1);
-	glUniform1f(glGetUniformLocation(shaderProgram, "material.shininess"), 128);
+	glUniform1i(glGetUniformLocation(shader.shaderProgram, "nbrOfSpot"), nbrOfSpot);
+	glUniform1i(glGetUniformLocation(shader.shaderProgram, "material.diffuse"), 0);
 
+	glUniform1i(glGetUniformLocation(shader.shaderProgram, "material.specular"), 1);
+	glUniform1f(glGetUniformLocation(shader.shaderProgram, "material.shininess"), 128);
 
-
-
-	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-
-	Mat4 projView = camera.GetProjection() * camera.GetView();
-	//Update the lights
 	for (int i = 0; i < lights.size(); i++)
 	{
-		lights[i]->Update(shaderProgram);
-	}
-	//Update the meshes
-	for (int i = 0; i < meshes.size(); i++)
-	{
-		meshes[i]->Update(projView, shaderProgram);
+		lights[i]->Update(shader.shaderProgram);
 	}
 
 	glfwPollEvents();
-	//inputs
 	processInput(window);
+
+}
+
+
+void App::RunLoop()
+{
+	while (!glfwWindowShouldClose(window))
+	{
+
+		float cureentFrame = static_cast<float>(glfwGetTime());
+		deltaTime = cureentFrame - lastFrame;
+		lastFrame = cureentFrame;
+
+		Update(deltaTime);
+
+		Draw();
+
+	}
+}
+
+
+void App::Draw()
+{
+	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glUseProgram(shader.shaderProgram);
+
+	Mat4 projView = camera.GetProjection() * camera.GetView();
+
+	//(o.luanda): if the mesh is drawable opengl can draw it 
+	for (int i = 0; i < meshes.size(); i++)
+	{
+		if (meshes[i]->model->modelDrawable)
+		{
+			meshes[i]->Draw(projView, shader.shaderProgram);
+		}
+		else if (meshes[i]->model->modelLoaded)
+		{
+			meshes[i]->InitTextureOpenGL();
+			meshes[i]->model->InitOpenGl();
+		}
+	}
 	//ImGUI windows
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
@@ -172,7 +331,7 @@ void App::Update(int shaderProgram, unsigned int VAO)
 						ImGui::TreePop();
 						ImGui::Separator();
 					}
-					
+
 				}
 				ImGui::TreePop();
 				ImGui::Separator();
@@ -184,9 +343,9 @@ void App::Update(int shaderProgram, unsigned int VAO)
 	ImGui::Text("Right click to capture/un-capture mouse");
 	if (ImGui::IsMouseClicked(ImGuiMouseButton_Right))
 	{
-		if(!mouseCaptured)
+		if (!mouseCaptured)
 		{
-	
+
 			mouseCaptured = true;
 			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 		}
@@ -198,14 +357,11 @@ void App::Update(int shaderProgram, unsigned int VAO)
 			mouseCaptured = false;
 			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 		}
-		
+
 	}
 	ImGui::End();
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 	glfwSwapBuffers(window);
-
-
 }
-

@@ -8,13 +8,21 @@ namespace LowRenderer
 {
 	class Mesh
 	{
-		private:
-		Model* model;
+	private:
 		Mat4 modelMatrix;
-		public:
-			GLuint texture;
-			Mesh(Model* model, const Mat4& mat, const char* file);
-			~Mesh();
-			void Update( Mat4& projviewMatrix, unsigned int shaderProgram);
+	public:
+		Model* model;
+		GLuint texture;
+		unsigned char* data;
+		int width;
+		int height;
+		int nrChannels;
+		Mesh(Model* model, const Mat4& mat, const char* file);
+		~Mesh();
+		void Draw(Mat4& projviewMatrix, unsigned int shaderProgram);
+		//----(o.luanda)-----------------
+		void InitTextureOpenGL();
+
+
 	};
 }

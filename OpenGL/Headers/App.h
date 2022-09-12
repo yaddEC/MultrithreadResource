@@ -3,18 +3,20 @@
 #include <GLFW/glfw3.h>
 #include <ResourceManager.h>
 #include <Log.h>
+#include "Shader.h"
 #include <Model.h>
 #include <Camera.h>
 #include <Mesh.h>
 #include <Light.h>
 #include <GameObject.h>
 #include <iostream>
+#include <thread>
 using namespace LowRenderer;
 namespace Core
 {
 	struct AppInitializer
 	{
-		
+
 		unsigned int width;
 		unsigned int height;
 		unsigned int major;
@@ -25,15 +27,16 @@ namespace Core
 	};
 
 
-	class App {
+	class App
+	{
 
 	public:
 		~App();
-		App() {};
+		App() :mResourceManager(nullptr) {};
 		bool mouseCaptured = false;
-		int nbrOfDir ;
+		int nbrOfDir;
 		int nbrOfPoint;
-		int nbrOfSpot ;
+		int nbrOfSpot;
 		bool firstMouse = true;
 		std::vector<Mesh*> meshes;
 		std::vector<GameObject*> gameObjects;
@@ -47,9 +50,34 @@ namespace Core
 
 		double newMouseX, newMouseY;
 		GLFWwindow* window;
-		void Init(AppInitializer init);
-		void Update(int shaderProgram, unsigned int VAO);
+		bool Init(AppInitializer init);
+
+		//----------------(o.luanda)--------------------
+		void RunLoop();
 		void processInput(GLFWwindow* window);
+		void ProcessThreadResource();
+	private:
+		void Update(float deltaTime);
+		void Draw();
+		bool LoadData();
+		void UnloadData();
+		bool LoadShaders();
+		void LoadResource();
+		void InitSampler();
+
+		class ResourceManager* mResourceManager;
+
+		Shader shader;
+		//Model* cube;
+		Model* model;
+		Model* cube;
+
+		GLuint sampler;
+		GLint max;
+		std::thread resourceThread;
+		bool resourceLoaded;
+		bool resourceDrawable;
+		//----------------(o.luanda)--------------------
 	};
 
 }

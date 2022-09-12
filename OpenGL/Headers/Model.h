@@ -13,13 +13,13 @@ namespace Resources
 {
 	struct Vertex
 	{
-		public:
-			Vec3 position;
-			Vec3 normal;
-			Vec2 textureUV;
+	public:
+		Vec3 position;
+		Vec3 normal;
+		Vec2 textureUV;
 	};
 
-	
+
 
 	class Buffer {
 	private:
@@ -35,7 +35,7 @@ namespace Resources
 
 	class VertexAttributes
 	{
-		public:
+	public:
 		unsigned int vao;
 		VertexAttributes();
 		~VertexAttributes();
@@ -54,5 +54,9 @@ namespace Resources
 		Buffer vbo;
 		void Load(const std::string& path) override;
 		void Print();
+		//---------(o.luanda)--------------
+		void InitOpenGl();
+		bool modelLoaded = false;
+		bool modelDrawable;
 	};
 }

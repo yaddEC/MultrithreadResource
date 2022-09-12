@@ -46,7 +46,7 @@ void VertexAttributes::bind()
 	glBindVertexArray(vao);
 }
 
-void VertexAttributes::unbind() 
+void VertexAttributes::unbind()
 {
 	glBindVertexArray(0);
 }
@@ -97,6 +97,8 @@ void Model::Load(const std::string& path)
 	Log log;
 	log.Print("Opening %s ...\n", const_cast <char*> (path.c_str()));
 
+	modelLoaded = false;
+	modelDrawable = false;
 	ifstream file(path);
 	ASSERT(file.is_open(), "ERROR: Cannot open the file");
 
@@ -171,15 +173,25 @@ void Model::Load(const std::string& path)
 	vertices.resize(indexVertex.size(), Vertex());
 	indexes.resize(indexVertex.size());
 
-	for (size_t i = 0; i < vertices.size(); ++i) 
+	for (size_t i = 0; i < vertices.size(); ++i)
 	{
 		vertices[i].position = tempVertex[indexVertex[i] - 1];
 		vertices[i].textureUV = tempUV[indexUV[i] - 1];
 		vertices[i].normal = tempNormals[indexNormal[i] - 1];
 		indexes[i] = i;
 	}
+
 	log.Print("Loaded \n");
 
+
+	modelLoaded = true;
+
+}
+
+void Model::InitOpenGl()
+{
 	vao.Load(vertices, indexes, vbo, ebo);
+
+	modelDrawable = true;
 
 }
