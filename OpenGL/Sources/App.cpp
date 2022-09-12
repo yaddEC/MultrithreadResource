@@ -6,17 +6,25 @@
 
 using namespace Core;
 
-
+//(o.luanda && y.dechaux) : iterator to load resource thread loader
 static volatile int iter = 0;
 
-//(o.luanda):Timing
+//(o.luanda && y.dechaux) :iterator to load resource without thread
+static int modelCounter = 0;
+
+static bool multiThreadApp = true;
+
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 
 App::~App()
 {
-	resourceThread.detach();
+	if (multiThreadApp)
+	{
+		resourceThread.detach();
+	}
+
 	UnloadData();
 	glfwTerminate();
 }
@@ -26,19 +34,6 @@ void App::ProcessThreadResource(std::vector<ModelAttribute> attribs)
 {
 	while (iter < attribs.size())
 	{
-
-#if 0 //(o.luanda):this part do what AddModel does
-		ModelAttribute* attrib = &attribs[iter];
-	
-		mResourceManager->Create<Model>(attrib->filePath);
-		models.push_back(mResourceManager->Get<Model>(attrib->filePath));
-
-		Model* cube = models[iter];
-		meshes.push_back(new Mesh(cube, Mat4().CreateTransformMatrix(attrib->rotation, attrib->position,
-			attrib->scale), attrib->texPath.c_str()));
-
-		this->gameObjects.push_back(new GameObject(attrib->name, this->meshes[iter]));
-#endif
 		AddModel(attribs);
 
 		iter++;
@@ -48,17 +43,42 @@ void App::ProcessThreadResource(std::vector<ModelAttribute> attribs)
 
 void App::AddModel(std::vector<ModelAttribute> attribs)
 {
-	ModelAttribute* attrib = &attribs[iter];
+	if (multiThreadApp)
+	{
+		ModelAttribute* attrib = &attribs[iter];
 
-	mResourceManager->Create<Model>(attrib->filePath);
-	models.push_back(mResourceManager->Get<Model>(attrib->filePath));
+		mResourceManager->Create<Model>(attrib->filePath);
+		models.push_back(mResourceManager->Get<Model>(attrib->filePath));
 
-	Model* cube = models[iter];
-	meshes.push_back(new Mesh(cube, Mat4().CreateTransformMatrix(attrib->rotation, attrib->position,
-		attrib->scale), attrib->texPath.c_str()));
+		Model* model = models[iter];
+		meshes.push_back(new Mesh(model, Mat4().CreateTransformMatrix(attrib->rotation, attrib->position,
+			attrib->scale), attrib->texPath.c_str()));
 
-	this->gameObjects.push_back(new GameObject(attrib->name, this->meshes[iter]));
+#if 1 //(o.luanda && y.dechaux) : comment this line to see models appear on the same time
+		std::this_thread::sleep_for(std::chrono::seconds(2));
+#endif
+		this->gameObjects.push_back(new GameObject(attrib->name, this->meshes[iter]));
 
+	}
+	else
+	{
+		while (modelCounter < attribs.size())
+		{
+			ModelAttribute* attrib = &attribs[modelCounter];
+
+			mResourceManager->Create<Model>(attrib->filePath);
+			models.push_back(mResourceManager->Get<Model>(attrib->filePath));
+
+			Model* model = models[modelCounter];
+			meshes.push_back(new Mesh(model, Mat4().CreateTransformMatrix(attrib->rotation, attrib->position,
+				attrib->scale), attrib->texPath.c_str()));
+
+			this->gameObjects.push_back(new GameObject(attrib->name, this->meshes[modelCounter]));
+
+			modelCounter++;
+
+		}
+	}
 }
 
 
@@ -78,24 +98,19 @@ void App::InitSampler()
 	glBindSampler(0, sampler);
 }
 
-#if 0
+
 bool App::LoadData()
 {
+	std::vector<ModelAttribute> attribs;
+	attribs.push_back({ std::string("Resources/Obj/cube.obj"), std::string("Cube"),std::string("Resources/Textures/Cube.png"),
+		{0.0f, -1.0f, 0.0f},{M_PI / 4.0f, 0.0f, 0.0f},{2.0f, 1.0f, 2.0f} });
 
-	mResourceManager->Create<Model>("../assets/cube.obj");
-	cube = mResourceManager->Get<Model>("../assets/cube.obj");
+	attribs.push_back({ std::string("Resources/Obj/malbazar.obj"), std::string("malbazar"),std::string("Resources/Textures/malbazar.png"),
+		{0.0f, 1.0f, 0.0f},{0.0f, 270.0f, 0.0f},{0.01f, 0.01f, 0.01f} });
 
-	mResourceManager->Create<Model>("../assets/malbazar.obj");
-	model = mResourceManager->Get<Model>("../assets/malbazar.obj");
-
-	this->meshes.push_back(new Mesh(cube, Mat4().CreateTransformMatrix(Vec3(M_PI / 4.0f, 0, 0), Vec3(0, -1, 0), Vec3(2, 1, 2)), "../assets/Cube.png"));
-	this->gameObjects.push_back(new GameObject("cube chat", this->meshes[0]));
-
-
-	this->meshes.push_back(new Mesh(model, Mat4().CreateTransformMatrix(Vec3(0, 270, 0), Vec3(0, 1, 0), Vec3(0.01, 0.01, 0.01)), "../assets/malbazar.png"));
-	this->gameObjects.push_back(new GameObject("malbazar", this->meshes[1]));
 
 	InitSampler();
+	AddModel(attribs);
 
 	for (int i = 0; i < this->gameObjects.size(); i++)
 	{
@@ -109,10 +124,11 @@ bool App::LoadData()
 	return true;
 
 }
-#endif
+
 
 void App::UnloadData()
 {
+
 	for (int i = 0; i < meshes.size(); i++)
 	{
 		glDeleteTextures(1, &meshes[i]->texture);
@@ -144,21 +160,24 @@ bool App::Init(AppInitializer init)
 		return false;
 	}
 
-	std::vector<ModelAttribute> attribs;
-	attribs.push_back({ std::string("Resources/Obj/cube.obj"), std::string("Cube"),std::string("Resources/Textures/Cube.png"),
-		{0.0f, -1.0f, 0.0f},{M_PI / 4.0f, 0.0f, 0.0f},{2.0f, 1.0f, 2.0f} });
 
-	attribs.push_back({ std::string("Resources/Obj/malbazar.obj"), std::string("malbazar"),std::string("Resources/Textures/malbazar.png"),
-		{0.0f, 1.0f, 0.0f},{0.0f, 270.0f, 0.0f},{0.01f, 0.01f, 0.01f} });
+	if (multiThreadApp)
+	{
+		std::vector<ModelAttribute> attribs;
+		attribs.push_back({ std::string("Resources/Obj/cube.obj"), std::string("Cube"),std::string("Resources/Textures/Cube.png"),
+			{0.0f, -1.0f, 0.0f},{M_PI / 4.0f, 0.0f, 0.0f},{2.0f, 1.0f, 2.0f} });
 
-	new (&resourceThread) std::thread(&App::ProcessThreadResource, this, attribs);
+		attribs.push_back({ std::string("Resources/Obj/malbazar.obj"), std::string("malbazar"),std::string("Resources/Textures/malbazar.png"),
+			{0.0f, 1.0f, 0.0f},{0.0f, 270.0f, 0.0f},{0.01f, 0.01f, 0.01f} });
 
+		new (&resourceThread) std::thread(&App::ProcessThreadResource, this, attribs);
 
+	}
 
 
 	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 
@@ -206,9 +225,6 @@ bool App::Init(AppInitializer init)
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init("#version 330");
 
-	//------------(o.luanda)-----------------
-
-
 
 	if (!LoadShaders())
 	{
@@ -216,15 +232,10 @@ bool App::Init(AppInitializer init)
 		return false;
 	}
 
-
-
-#if 0
-	if (!LoadData())
+	if (!multiThreadApp && !LoadData())
 	{
 		return false;
 	}
-#endif
-	//------------(o.luanda)-----------------
 
 	return true;
 }
@@ -269,10 +280,8 @@ void App::Update(float deltaTime)
 		inputs.deltaY = mouseDeltaY;
 	}
 
-#if 0
-	camera.Update((float)glfwGetTime() * 0.05f, inputs);
 	camera.Update(deltaTime, inputs);
-#endif
+
 
 	//push matrix/floats to shader
 	glUseProgram(shader.shaderProgram);
@@ -324,7 +333,7 @@ void App::Draw()
 
 	Mat4 projView = camera.GetProjection() * camera.GetView();
 
-	//(o.luanda): if the mesh is drawable opengl can draw it 
+	
 	for (int i = 0; i < meshes.size(); i++)
 	{
 		if (meshes[i]->model->modelDrawable)

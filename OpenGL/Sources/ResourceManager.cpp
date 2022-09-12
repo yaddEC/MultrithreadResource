@@ -9,7 +9,6 @@ void ResourceManager::Delete(const std::string& name)
 	}
 }
 
-//-----------------------(o.luanda)------------------------------
 void ResourceManager::Unload()
 {
 	for (auto i : resources)

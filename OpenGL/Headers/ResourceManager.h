@@ -32,7 +32,7 @@ public:
 	}
 
 	void Delete(const std::string& name);
-	//(o.luanda):Unload resource loaded and clean map of resource
+	
 	void Unload();
 
 private:

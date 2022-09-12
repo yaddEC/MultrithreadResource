@@ -4,7 +4,7 @@ using namespace Core;
 using namespace Maths;
 using namespace LowRenderer;
 #define sensitivity 0.05f
-//Update the camera with the inputs
+
 void Camera::Update(const float p_deltaTime, const CameraInputs& inputs)
 {
 	to.x += inputs.deltaX * p_deltaTime* sensitivity;
@@ -14,7 +14,7 @@ void Camera::Update(const float p_deltaTime, const CameraInputs& inputs)
 	if (to.x < 100)
 		to.x = 100;
 }
-//Generate the viewMatrix with the mouse inputs
+
 Mat4 Camera::GetView()
 {
 	Vec3 direction;
@@ -39,7 +39,7 @@ Mat4 Camera::GetView()
 
 	return array;
 }
-//Generate the projection matrix
+
 Mat4 Camera::GetProjection()
 {
 	float f = 100;

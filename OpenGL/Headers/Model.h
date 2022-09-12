@@ -54,7 +54,7 @@ namespace Resources
 		Buffer vbo;
 		void Load(const std::string& path) override;
 		void Print();
-		//---------(o.luanda)--------------
+		
 		void InitOpenGl();
 		bool modelLoaded = false;
 		bool modelDrawable;

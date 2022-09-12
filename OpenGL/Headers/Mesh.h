@@ -20,7 +20,7 @@ namespace LowRenderer
 		Mesh(Model* model, const Mat4& mat, const char* file);
 		~Mesh();
 		void Draw(Mat4& projviewMatrix, unsigned int shaderProgram);
-		//----(o.luanda)-----------------
+		
 		void InitTextureOpenGL();
 
 

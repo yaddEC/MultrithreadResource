@@ -64,9 +64,8 @@ namespace Core
 		GLFWwindow* window;
 		bool Init(AppInitializer init);
 
-		//----------------(o.luanda)--------------------
-		void RunLoop();
 		void processInput(GLFWwindow* window);
+		void RunLoop();
 
 		void ProcessThreadResource(std::vector<ModelAttribute> attrib);
 
@@ -75,10 +74,9 @@ namespace Core
 	private:
 		void Update(float deltaTime);
 		void Draw();
+		bool LoadShaders();
 		bool LoadData();
 		void UnloadData();
-		bool LoadShaders();
-		void LoadResource();
 		void InitSampler();
 
 
@@ -93,7 +91,7 @@ namespace Core
 		std::thread resourceThread;
 		bool resourceLoaded;
 		bool resourceDrawable;
-		//----------------(o.luanda)--------------------
+		
 	};
 
 }

@@ -11,7 +11,6 @@ using namespace Core;
 using namespace Debug;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow* window);
 
 void APIENTRY glDebugOutput(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
 {
@@ -63,7 +62,7 @@ int main(int argc, char** argv)
 {
 
 	//Create/Initialise the App window
-	AppInitializer initialiser = { screenWidth,screenHeight, 4, 5, "Osvaldo && Yan", framebuffer_size_callback, glDebugOutput };
+	AppInitializer initialiser = { screenWidth,screenHeight, 3, 3, "Osvaldo && Yan", framebuffer_size_callback, glDebugOutput };
 	App app;
 
 	bool success = app.Init(initialiser);
