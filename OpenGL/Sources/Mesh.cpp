@@ -11,7 +11,7 @@ Mesh::Mesh(Model* model, const Mat4& mat, const char* file)
 	this->model = model;
 	this->modelMatrix = mat;
 	//int width, height, nrChannels;
-	//stbi_set_flip_vertically_on_load(true);
+	stbi_set_flip_vertically_on_load(true);
 	data = stbi_load(file, &width, &height, &nrChannels, 0);
 
 }

@@ -21,7 +21,7 @@ namespace LowRenderer
         Core::Maths::Vec3 forward = { 0,0,0 };
         Core::Maths::Vec3 up = { 0,0,0 };
         Core::Maths::Vec3 right = { 0,0,0 };
-        float speed =0.03;
+        float speed =0.03f;
 
         void Update(const float p_deltaTime, const CameraInputs& p_inputs);
         Core::Maths::Mat4 GetView();

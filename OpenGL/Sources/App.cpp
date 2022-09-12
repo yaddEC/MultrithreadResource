@@ -7,6 +7,8 @@
 using namespace Core;
 
 
+static volatile int iter = 0;
+
 //(o.luanda):Timing
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
@@ -14,36 +16,49 @@ float lastFrame = 0.0f;
 
 App::~App()
 {
+	resourceThread.detach();
 	UnloadData();
 	glfwTerminate();
 }
 
 
-
-void App::ProcessThreadResource()
+void App::ProcessThreadResource(std::vector<ModelAttribute> attribs)
 {
-
-	mResourceManager->Create<Model>("Resources/Obj/cube.obj");
-	cube = mResourceManager->Get<Model>("Resources/Obj/cube.obj");
-
-	mResourceManager->Create<Model>("Resources/Obj/malbazar.obj");
-	model = mResourceManager->Get<Model>("Resources/Obj/malbazar.obj");
-
-	this->meshes.push_back(new Mesh(cube, Mat4().CreateTransformMatrix(Vec3(M_PI / 4.0f, 0, 0), Vec3(0, -1, 0), Vec3(2, 1, 2)), "Resources/Textures/Cube.png"));
-	this->gameObjects.push_back(new GameObject("cube chat", this->meshes[0]));
-
-
-
-	this->meshes.push_back(new Mesh(model, Mat4().CreateTransformMatrix(Vec3(0, 270, 0), Vec3(0, 1, 0), Vec3(0.01, 0.01, 0.01)), "Resources/Textures/malbazar.png"));
-	this->gameObjects.push_back(new GameObject("malbazar", this->meshes[1]));
-
-	for (int i = 0; i < this->gameObjects.size(); i++)
+	while (iter < attribs.size())
 	{
-		if (this->gameObjects[i]->parent != nullptr)
-		{
-			this->gameObjects[i]->parent->childrens.push_back(*gameObjects[i]);
-		}
+
+#if 0 //(o.luanda):this part do what AddModel does
+		ModelAttribute* attrib = &attribs[iter];
+	
+		mResourceManager->Create<Model>(attrib->filePath);
+		models.push_back(mResourceManager->Get<Model>(attrib->filePath));
+
+		Model* cube = models[iter];
+		meshes.push_back(new Mesh(cube, Mat4().CreateTransformMatrix(attrib->rotation, attrib->position,
+			attrib->scale), attrib->texPath.c_str()));
+
+		this->gameObjects.push_back(new GameObject(attrib->name, this->meshes[iter]));
+#endif
+		AddModel(attribs);
+
+		iter++;
 	}
+}
+
+
+void App::AddModel(std::vector<ModelAttribute> attribs)
+{
+	ModelAttribute* attrib = &attribs[iter];
+
+	mResourceManager->Create<Model>(attrib->filePath);
+	models.push_back(mResourceManager->Get<Model>(attrib->filePath));
+
+	Model* cube = models[iter];
+	meshes.push_back(new Mesh(cube, Mat4().CreateTransformMatrix(attrib->rotation, attrib->position,
+		attrib->scale), attrib->texPath.c_str()));
+
+	this->gameObjects.push_back(new GameObject(attrib->name, this->meshes[iter]));
+
 }
 
 
@@ -128,7 +143,18 @@ bool App::Init(AppInitializer init)
 		std::cout << "Failed to initialize resource Manager" << std::endl;
 		return false;
 	}
-	new (&resourceThread) std::thread(&App::ProcessThreadResource, this);
+
+	std::vector<ModelAttribute> attribs;
+	attribs.push_back({ std::string("Resources/Obj/cube.obj"), std::string("Cube"),std::string("Resources/Textures/Cube.png"),
+		{0.0f, -1.0f, 0.0f},{M_PI / 4.0f, 0.0f, 0.0f},{2.0f, 1.0f, 2.0f} });
+
+	attribs.push_back({ std::string("Resources/Obj/malbazar.obj"), std::string("malbazar"),std::string("Resources/Textures/malbazar.png"),
+		{0.0f, 1.0f, 0.0f},{0.0f, 270.0f, 0.0f},{0.01f, 0.01f, 0.01f} });
+
+	new (&resourceThread) std::thread(&App::ProcessThreadResource, this, attribs);
+
+
+
 
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);

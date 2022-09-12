@@ -11,7 +11,19 @@
 #include <GameObject.h>
 #include <iostream>
 #include <thread>
+#include <vector>
 using namespace LowRenderer;
+
+struct ModelAttribute
+{
+	std::string filePath;
+	std::string name;
+	std::string texPath;
+	Vec3 position;
+	Vec3 rotation;
+	Vec3 scale;
+};
+
 namespace Core
 {
 	struct AppInitializer
@@ -55,7 +67,11 @@ namespace Core
 		//----------------(o.luanda)--------------------
 		void RunLoop();
 		void processInput(GLFWwindow* window);
-		void ProcessThreadResource();
+
+		void ProcessThreadResource(std::vector<ModelAttribute> attrib);
+
+		void AddModel(std::vector<ModelAttribute> attribs);
+
 	private:
 		void Update(float deltaTime);
 		void Draw();
@@ -65,12 +81,12 @@ namespace Core
 		void LoadResource();
 		void InitSampler();
 
+
 		class ResourceManager* mResourceManager;
 
 		Shader shader;
-		//Model* cube;
-		Model* model;
-		Model* cube;
+
+		std::vector<Model*> models;
 
 		GLuint sampler;
 		GLint max;
