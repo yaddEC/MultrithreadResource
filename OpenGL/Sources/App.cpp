@@ -20,11 +20,6 @@ float lastFrame = 0.0f;
 
 App::~App()
 {
-	if (multiThreadApp)
-	{
-		resourceThread.detach();
-	}
-
 	UnloadData();
 	glfwTerminate();
 }
@@ -54,7 +49,7 @@ void App::AddModel(std::vector<ModelAttribute> attribs)
 		meshes.push_back(new Mesh(model, Mat4().CreateTransformMatrix(attrib->rotation, attrib->position,
 			attrib->scale), attrib->texPath.c_str()));
 
-#if 1 //(o.luanda && y.dechaux) : comment this line to see models appear on the same time
+#if 0 //(o.luanda && y.dechaux) : comment/uncomment this line to see models appear on the same time or wait
 		std::this_thread::sleep_for(std::chrono::seconds(2));
 #endif
 		this->gameObjects.push_back(new GameObject(attrib->name, this->meshes[iter]));
@@ -171,7 +166,7 @@ bool App::Init(AppInitializer init)
 			{0.0f, 1.0f, 0.0f},{0.0f, 270.0f, 0.0f},{0.01f, 0.01f, 0.01f} });
 
 		new (&resourceThread) std::thread(&App::ProcessThreadResource, this, attribs);
-
+		resourceThread.detach();
 	}
 
 

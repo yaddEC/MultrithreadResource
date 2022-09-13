@@ -1,6 +1,6 @@
 #pragma once
-#include <IResource.h>
-#include <Maths.h>
+#include "IResource.h"
+#include "Maths.h"
 #include <filesystem>
 #include <iostream>
 using namespace Core::Maths;
