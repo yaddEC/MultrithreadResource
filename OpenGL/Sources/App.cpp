@@ -3,6 +3,7 @@
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
+#include <chrono>
 
 using namespace Core;
 
@@ -97,15 +98,24 @@ void App::InitSampler()
 bool App::LoadData()
 {
 	std::vector<ModelAttribute> attribs;
-	attribs.push_back({ std::string("Resources/Obj/cube.obj"), std::string("Cube"),std::string("Resources/Textures/Cube.png"),
-		{0.0f, -1.0f, 0.0f},{M_PI / 4.0f, 0.0f, 0.0f},{2.0f, 1.0f, 2.0f} });
+	attribs.push_back({ std::string("Resources/Obj/cube.obj"), std::string("Cube"),std::string("Resources/Textures/Plane.jpg"),
+		{0.0f, -1.0f, 0.0f},{M_PI / 4.0f + M_PI, 0.0f, 0.0f},{2.0f, 1.0f, 2.0f} });
 
 	attribs.push_back({ std::string("Resources/Obj/malbazar.obj"), std::string("malbazar"),std::string("Resources/Textures/malbazar.png"),
-		{0.0f, 1.0f, 0.0f},{0.0f, 270.0f, 0.0f},{0.01f, 0.01f, 0.01f} });
+		{0.0f, 1.0f, 0.0f},{0.0f, M_PI * 19.0f / 18.0f, 0.0f},{0.01f, 0.01f, 0.01f} });
 
 
 	InitSampler();
+
+	auto start = std::chrono::high_resolution_clock::now();
+
 	AddModel(attribs);
+
+	auto end = std::chrono::high_resolution_clock::now();
+
+	std::chrono::duration<double> delta = end - start;
+
+	printf("It took: %.5f secs\n", delta.count());
 
 	for (int i = 0; i < this->gameObjects.size(); i++)
 	{
@@ -158,15 +168,26 @@ bool App::Init(AppInitializer init)
 
 	if (multiThreadApp)
 	{
+
 		std::vector<ModelAttribute> attribs;
-		attribs.push_back({ std::string("Resources/Obj/cube.obj"), std::string("Cube"),std::string("Resources/Textures/Cube.png"),
-			{0.0f, -1.0f, 0.0f},{M_PI / 4.0f, 0.0f, 0.0f},{2.0f, 1.0f, 2.0f} });
+		attribs.push_back({ std::string("Resources/Obj/cube.obj"), std::string("Cube"),std::string("Resources/Textures/wall.jpg"),
+			{0.0f, -1.0f, 0.0f},{M_PI / 4.0f + M_PI, 0.0f, 0.0f},{2.0f, 1.0f, 2.0f} });
 
 		attribs.push_back({ std::string("Resources/Obj/malbazar.obj"), std::string("malbazar"),std::string("Resources/Textures/malbazar.png"),
-			{0.0f, 1.0f, 0.0f},{0.0f, 270.0f, 0.0f},{0.01f, 0.01f, 0.01f} });
+			{0.0f, 1.0f, 0.0f},{0.0f, M_PI * 19.0f / 18.0f, 0.0f},{0.01f, 0.01f, 0.01f} });
+
+		auto start = std::chrono::high_resolution_clock::now();
 
 		new (&resourceThread) std::thread(&App::ProcessThreadResource, this, attribs);
+
+		auto end = std::chrono::high_resolution_clock::now();
+
+		std::chrono::duration<double> delta = end - start;
+
+		printf("It took: %.5f secs\n", delta.count());
 		resourceThread.detach();
+
+
 	}
 
 
@@ -181,7 +202,7 @@ bool App::Init(AppInitializer init)
 	nbrOfPoint = 0;
 	nbrOfSpot = 0;
 
-	lights.push_back((new DirectionalLight(Vec3(0.5f, 0.5f, 0.5f), Vec3(0.5f, 0.5f, 0.5f), Vec3(1.0f, 1.0f, 1), Vec3(0, -1, 0))));
+	lights.push_back((new DirectionalLight(Vec3(1.0f, 1.0f, 1.0f), Vec3(0.5f, 0.5f, 0.5f), Vec3(1.0f, 1.0f, 1), Vec3(0, -1, 0))));
 
 	window = glfwCreateWindow(init.width, init.height, "Game Programming", NULL, NULL);
 	if (window == NULL)
@@ -294,6 +315,16 @@ void App::Update(float deltaTime)
 	for (int i = 0; i < lights.size(); i++)
 	{
 		lights[i]->Update(shader.shaderProgram);
+	}
+
+	//(o.luanda):rotate even models
+	for (size_t i = 0; i < meshes.size(); i++)
+	{
+		if (!(i % 2))
+		{
+			meshes[i]->modelMatrix = meshes[i]->modelMatrix * meshes[i]->modelMatrix.CreateYRotationMatrix(M_PI * deltaTime / 3);
+
+		}
 	}
 
 	glfwPollEvents();

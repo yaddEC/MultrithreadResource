@@ -3,7 +3,7 @@
 using namespace Core;
 using namespace Maths;
 using namespace LowRenderer;
-#define sensitivity 0.05f
+#define sensitivity 1.0f
 
 void Camera::Update(const float p_deltaTime, const CameraInputs& inputs)
 {

@@ -9,8 +9,8 @@ namespace LowRenderer
 	class Mesh
 	{
 	private:
-		Mat4 modelMatrix;
 	public:
+		Mat4 modelMatrix;
 		Model* model;
 		GLuint texture;
 		unsigned char* data;
