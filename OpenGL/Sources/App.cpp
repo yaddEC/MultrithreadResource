@@ -50,9 +50,6 @@ void App::AddModel(std::vector<ModelAttribute> attribs)
 		meshes.push_back(new Mesh(model, Mat4().CreateTransformMatrix(attrib->rotation, attrib->position,
 			attrib->scale), attrib->texPath.c_str()));
 
-#if 0 //(o.luanda && y.dechaux) : comment/uncomment this line to see models appear on the same time or wait
-		std::this_thread::sleep_for(std::chrono::seconds(2));
-#endif
 		this->gameObjects.push_back(new GameObject(attrib->name, this->meshes[iter]));
 
 	}
@@ -98,11 +95,20 @@ void App::InitSampler()
 bool App::LoadData()
 {
 	std::vector<ModelAttribute> attribs;
-	attribs.push_back({ std::string("Resources/Obj/cube.obj"), std::string("Cube"),std::string("Resources/Textures/Plane.jpg"),
-		{0.0f, -1.0f, 0.0f},{M_PI / 4.0f + M_PI, 0.0f, 0.0f},{2.0f, 1.0f, 2.0f} });
+	attribs.push_back({ std::string("Resources/Obj/cube.obj"), std::string("Cube"),std::string("Resources/Textures/malbazar.png"),
+	{0.0f, -1.0f, 0.0f},{M_PI / 4.0f, 0.0f, 0.0f},{2.0f, 1.0f, 2.0f} });
 
-	attribs.push_back({ std::string("Resources/Obj/malbazar.obj"), std::string("malbazar"),std::string("Resources/Textures/malbazar.png"),
-		{0.0f, 1.0f, 0.0f},{0.0f, M_PI * 19.0f / 18.0f, 0.0f},{0.01f, 0.01f, 0.01f} });
+
+	attribs.push_back({ std::string("Resources/Obj/malbazar.obj"), std::string("yann"),std::string("Resources/Textures/malbazar.png"),
+		{0.0f, -1.0f, -5.0f},{0.0f, M_PI * 19.0f / 18.0f, 0.0f},{0.01f, 0.01f, 0.01f} });
+
+
+	attribs.push_back({ std::string("Resources/Obj/malbazar.obj"), std::string("malbazar1"),std::string("Resources/Textures/malbazar.png"),
+		{-1.5f, 1.0f, 0.0f},{0.0f, M_PI * 19.0f / 18.0f, 0.0f},{0.01f, 0.01f, 0.01f} });
+
+	attribs.push_back({ std::string("Resources/Obj/malbazar.obj"), std::string("malbazar2"),std::string("Resources/Textures/malbazar.png"),
+		{1.5f, 1.0f, 0.0f},{0.0f, M_PI * 19.0f / 18.0f, 0.0f},{0.01f, 0.01f, 0.01f} });
+
 
 
 	InitSampler();
@@ -124,7 +130,6 @@ bool App::LoadData()
 			this->gameObjects[i]->parent->childrens.push_back(*gameObjects[i]);
 		}
 	}
-
 
 	return true;
 
@@ -168,25 +173,31 @@ bool App::Init(AppInitializer init)
 
 	if (multiThreadApp)
 	{
-
 		std::vector<ModelAttribute> attribs;
-		attribs.push_back({ std::string("Resources/Obj/cube.obj"), std::string("Cube"),std::string("Resources/Textures/wall.jpg"),
-			{0.0f, -1.0f, 0.0f},{M_PI / 4.0f + M_PI, 0.0f, 0.0f},{2.0f, 1.0f, 2.0f} });
+		attribs.push_back({ std::string("Resources/Obj/cube.obj"), std::string("Cube"),std::string("Resources/Textures/malbazar.png"),
+			{0.0f, -1.0f, 0.0f},{M_PI / 4.0f, 0.0f, 0.0f},{2.0f, 1.0f, 2.0f} });
 
-		attribs.push_back({ std::string("Resources/Obj/malbazar.obj"), std::string("malbazar"),std::string("Resources/Textures/malbazar.png"),
-			{0.0f, 1.0f, 0.0f},{0.0f, M_PI * 19.0f / 18.0f, 0.0f},{0.01f, 0.01f, 0.01f} });
+
+		attribs.push_back({ std::string("Resources/Obj/malbazar.obj"), std::string("yann"),std::string("Resources/Textures/malbazar.png"),
+			{0.0f, -1.0f, -5.0f},{0.0f, M_PI * 19.0f / 18.0f, 0.0f},{0.01f, 0.01f, 0.01f} });
+
+
+		attribs.push_back({ std::string("Resources/Obj/malbazar.obj"), std::string("malbazar1"),std::string("Resources/Textures/malbazar.png"),
+			{-1.5f, 1.0f, 0.0f},{0.0f, M_PI * 19.0f / 18.0f, 0.0f},{0.01f, 0.01f, 0.01f} });
+
+		attribs.push_back({ std::string("Resources/Obj/malbazar.obj"), std::string("malbazar2"),std::string("Resources/Textures/malbazar.png"),
+			{1.5f, 1.0f, 0.0f},{0.0f, M_PI * 19.0f / 18.0f, 0.0f},{0.01f, 0.01f, 0.01f} });
 
 		auto start = std::chrono::high_resolution_clock::now();
 
 		new (&resourceThread) std::thread(&App::ProcessThreadResource, this, attribs);
-
 		auto end = std::chrono::high_resolution_clock::now();
 
 		std::chrono::duration<double> delta = end - start;
 
 		printf("It took: %.5f secs\n", delta.count());
-		resourceThread.detach();
 
+		resourceThread.detach();
 
 	}
 
@@ -202,7 +213,7 @@ bool App::Init(AppInitializer init)
 	nbrOfPoint = 0;
 	nbrOfSpot = 0;
 
-	lights.push_back((new DirectionalLight(Vec3(1.0f, 1.0f, 1.0f), Vec3(0.5f, 0.5f, 0.5f), Vec3(1.0f, 1.0f, 1), Vec3(0, -1, 0))));
+	lights.push_back((new DirectionalLight(Vec3(0.5f, 0.5f, 0.5f), Vec3(0.5f, 0.5f, 0.5f), Vec3(1.0f, 1.0f, 1), Vec3(0, -1, 0))));
 
 	window = glfwCreateWindow(init.width, init.height, "Game Programming", NULL, NULL);
 	if (window == NULL)
@@ -296,8 +307,9 @@ void App::Update(float deltaTime)
 		inputs.deltaY = mouseDeltaY;
 	}
 
+#if 1
 	camera.Update(deltaTime, inputs);
-
+#endif
 
 	//push matrix/floats to shader
 	glUseProgram(shader.shaderProgram);
@@ -317,7 +329,12 @@ void App::Update(float deltaTime)
 		lights[i]->Update(shader.shaderProgram);
 	}
 
-	//(o.luanda):rotate even models
+	meshes[1]->modelMatrix = meshes[1]->modelMatrix * meshes[1]->modelMatrix.CreateYRotationMatrix(M_PI * deltaTime);
+
+
+#if 0
+
+	//(o.luanda):rotate all models
 	for (size_t i = 0; i < meshes.size(); i++)
 	{
 		if (!(i % 2))
@@ -326,6 +343,7 @@ void App::Update(float deltaTime)
 
 		}
 	}
+#endif
 
 	glfwPollEvents();
 	processInput(window);
@@ -359,7 +377,7 @@ void App::Draw()
 
 	Mat4 projView = camera.GetProjection() * camera.GetView();
 
-	
+
 	for (int i = 0; i < meshes.size(); i++)
 	{
 		if (meshes[i]->model->modelDrawable)

@@ -101,3 +101,7 @@ C:\Deve\Doom\OpenGL\Sources\main.cpp(84): DebugLog Test
 C:\Deve\Doom\OpenGL\Sources\main.cpp(84): DebugLog Test 
 C:\Deve\Doom\OpenGL\Sources\main.cpp(84): DebugLog Test 
 C:\Deve\Doom\OpenGL\Sources\main.cpp(84): DebugLog Test 
+C:\Deve\Doom\OpenGL\Sources\main.cpp(84): DebugLog Test 
+C:\Deve\Doom\OpenGL\Sources\main.cpp(84): DebugLog Test 
+C:\Deve\Doom\OpenGL\Sources\main.cpp(84): DebugLog Test 
+C:\Deve\Doom\OpenGL\Sources\main.cpp(84): DebugLog Test 
