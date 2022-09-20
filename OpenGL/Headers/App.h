@@ -9,6 +9,7 @@
 #include <Mesh.h>
 #include <Light.h>
 #include <GameObject.h>
+#include <Threadpool.h>
 #include <iostream>
 #include <thread>
 #include <vector>
@@ -62,6 +63,8 @@ namespace Core
 
 		double newMouseX, newMouseY;
 		GLFWwindow* window;
+		ThreadPool* pool;
+
 		bool Init(AppInitializer init);
 
 		void processInput(GLFWwindow* window);
@@ -69,7 +72,7 @@ namespace Core
 
 		void ProcessThreadResource(std::vector<ModelAttribute> attrib);
 
-		void AddModel(std::vector<ModelAttribute> attribs);
+		void AddModel(std::vector<ModelAttribute> attribs, int i = 0);
 
 	private:
 		void Update(float deltaTime);

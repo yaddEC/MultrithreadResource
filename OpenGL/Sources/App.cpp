@@ -9,38 +9,89 @@ using namespace Core;
 
 //(o.luanda && y.dechaux) : iterator to load resource thread loader
 static volatile int iter = 0;
+static volatile int iter2 = 0;
 
 //(o.luanda && y.dechaux) :iterator to load resource without thread
 static int modelCounter = 0;
 
+//set this to false to see the how much longer it takes to load models
 static bool multiThreadApp = true;
+
+static bool usingThreadpool = true; //dont set this to true if multiThreadApp is set to false
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
+Flag* lock;
 
 
 App::~App()
 {
 	UnloadData();
 	glfwTerminate();
+	if (usingThreadpool)
+	{
+		while (1)
+		{
+			if (!pool->Busy())
+			{
+				pool->Stop();
+			}
+		}
+	}
 }
 
 
 void App::ProcessThreadResource(std::vector<ModelAttribute> attribs)
 {
+	if (usingThreadpool)
+	{
+		int iteration = 0;
+		while (iteration < attribs.size())
+		{
+			std::function<void()> addmod = (std::bind([=] {App::AddModel(attribs, iteration); }));
+			pool->Queue(addmod);
+			iteration++;
+			//iter++;
+		}
+
+
+	}
+	else
+	{ 
 	while (iter < attribs.size())
 	{
 		AddModel(attribs);
 
 		iter++;
 	}
+	}
 }
 
 
-void App::AddModel(std::vector<ModelAttribute> attribs)
+void App::AddModel(std::vector<ModelAttribute> attribs, int i)
 {
 	if (multiThreadApp)
 	{
+		if (usingThreadpool)
+		{
+			
+			ModelAttribute* attrib = &attribs[i];
+			
+
+			mResourceManager->Create<Model>(attrib->filePath);
+			models.push_back(mResourceManager->Get<Model>(attrib->filePath));
+
+			//Model* model = models[i];
+			Mesh *mesh = new Mesh(mResourceManager->Get<Model>(attribs[i].filePath), Mat4().CreateTransformMatrix(attribs[i].rotation, attribs[i].position,
+				attribs[i].scale), attribs[i].texPath.c_str());
+			meshes.push_back(mesh);
+		
+			this->gameObjects.push_back(new GameObject(attribs[i].name,mesh)); 
+			
+	
+		}
+		else
+		{ 
 		ModelAttribute* attrib = &attribs[iter];
 
 		mResourceManager->Create<Model>(attrib->filePath);
@@ -51,7 +102,7 @@ void App::AddModel(std::vector<ModelAttribute> attribs)
 			attrib->scale), attrib->texPath.c_str()));
 
 		this->gameObjects.push_back(new GameObject(attrib->name, this->meshes[iter]));
-
+		}
 	}
 	else
 	{
@@ -163,6 +214,11 @@ bool App::LoadShaders()
 
 bool App::Init(AppInitializer init)
 {
+	if (usingThreadpool)
+	{
+		lock = new Flag();
+		pool = new ThreadPool();
+	}
 	mResourceManager = new ResourceManager();
 	if (!mResourceManager)
 	{
@@ -380,12 +436,14 @@ void App::Draw()
 
 	for (int i = 0; i < meshes.size(); i++)
 	{
-		if (meshes[i]->model->modelDrawable)
+		//std::this_thread::sleep_for(std::chrono::milliseconds(2))
+		if (meshes[i]->texture != 0)
 		{
 			meshes[i]->Draw(projView, shader.shaderProgram);
 		}
-		else if (meshes[i]->model->modelLoaded)
+		else if (meshes[i]->texture==0)
 		{
+
 			meshes[i]->InitTextureOpenGL();
 			meshes[i]->model->InitOpenGl();
 		}
